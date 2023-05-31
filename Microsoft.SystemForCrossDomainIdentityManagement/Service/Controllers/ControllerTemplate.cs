@@ -205,9 +205,7 @@ namespace Microsoft.SCIM
                                 resourceQuery.PaginationParameters,
                                 correlationIdentifier)
                             .ConfigureAwait(false);
-                var response = this.Ok(result);
-                response.ContentTypes.Add("application/scim+json");
-                return response;
+                return this.Ok(result);
             }
             catch (ArgumentException argumentException)
             {

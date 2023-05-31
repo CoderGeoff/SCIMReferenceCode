@@ -100,6 +100,7 @@ namespace Microsoft.SCIM.WebHostSample
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseMiddleware<ApplyScimContentTypeHeader>();
 
             app.UseEndpoints(
                 (IEndpointRouteBuilder endpoints) =>
