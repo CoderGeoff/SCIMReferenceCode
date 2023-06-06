@@ -1,30 +1,27 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using ScimValidatorProxy.Controllers;
 
 namespace ScimValidatorProxy
 {
-    public class ApplyScimContentTypeHeader
+    public class ForwardRequestToScimService
     {
+        private readonly IServiceProvider serviceProvider;
         private readonly RequestDelegate next;
 
-        public ApplyScimContentTypeHeader(RequestDelegate next)
+        public ForwardRequestToScimService(IServiceProvider serviceProvider, RequestDelegate next)
         {
+            this.serviceProvider = serviceProvider;
             this.next = next;
         }
 
         public async Task InvokeAsync(HttpContext context)
         {
-            context.Response.OnStarting(ApplyHeader);
+            var proxy = serviceProvider.GetService<IProxy>();
+            await proxy.ForwardAsync(context);
             await next(context);
-            Task ApplyHeader()
-            {
-                if (context.Response.StatusCode == 200)
-                {
-                    context.Response.Headers["Content-Type"] = "application/scim+json";
-                }
-
-                return Task.CompletedTask;
-            }
         }
     }
 }

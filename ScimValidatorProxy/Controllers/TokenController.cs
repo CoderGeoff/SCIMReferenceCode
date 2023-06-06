@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ScimValidatorProxy.Controllers
@@ -17,12 +18,14 @@ namespace ScimValidatorProxy.Controllers
     [ApiController]
     public class TokenController : ControllerBase
     {
-        private readonly IConfiguration configuration;        
+        private readonly IConfiguration configuration;
+        private readonly IProxy proxy;
         private const int defaultTokenExpirationTimeInMins = 120;
 
-        public TokenController(IConfiguration Configuration)
+        public TokenController(IConfiguration configuration, IServiceProvider serviceProvider)
         {
-            this.configuration = Configuration;
+            this.configuration = configuration;
+            proxy = serviceProvider.GetService<IProxy>();
         }
 
         private string GenerateJSONWebToken()
