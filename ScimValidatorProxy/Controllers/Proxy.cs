@@ -1,13 +1,13 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Security.Permissions;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace ScimValidatorProxy.Controllers
 {
@@ -39,7 +39,8 @@ namespace ScimValidatorProxy.Controllers
                 if (!string.IsNullOrEmpty(content))
                 {
                     var (encoding, mediaType) = ToEncodingAndMediaType(originalRequest.ContentType);
-                    targetRequestMessage.Content = new StringContent(content, encoding, mediaType);
+                    var correctedContent = Correct(content);
+                    targetRequestMessage.Content = new StringContent(correctedContent, encoding, mediaType);
                 }
 
                 Console.WriteLine(ForwardingMessage(originalRequest, targetRequestMessage));
@@ -52,6 +53,13 @@ namespace ScimValidatorProxy.Controllers
             }
         }
 
+        private string Correct(string content)
+        {
+            var regex = new Regex("\\\"primary\\\": *\\\"[0-9\\-\\(\\)x\\. ]*\\\"");
+            var corrected = regex.Replace(content, "\"primary\": false");
+            return corrected;
+        }
+
         private static (Encoding encoding, string mediaType) ToEncodingAndMediaType(string contentType)
         {
             var parts = contentType.Split(";").Select(s => s.Trim()).ToArray();
@@ -61,16 +69,16 @@ namespace ScimValidatorProxy.Controllers
             return (encoding, mediaType);
         }
 
-        private string ForwardingMessage(HttpRequest originalRequest, HttpRequestMessage forwardedRequest)
+        private static string ForwardingMessage(HttpRequest originalRequest, HttpRequestMessage forwardedRequest)
         {
             var s = new StringBuilder();
-            s.AppendLine($"Forwarding {originalRequest.Method} {originalRequest.Scheme}://{originalRequest.Host}{originalRequest.Path}");
+            s.AppendLine("Forwarding")
+             .AppendLine(originalRequest.GetDisplayUrl());
             AppendHeaders(s, originalRequest.Headers.Select(entry => KeyValuePair.Create(entry.Key, entry.Value.AsEnumerable())))
-               .AppendLine("")
                .AppendLine("  to")
                .AppendLine($"{forwardedRequest.Method} {forwardedRequest.RequestUri}");
             AppendHeaders(s, forwardedRequest.Headers)
-               .AppendLine("").AppendLine("");
+               .AppendLine("");
             return s.ToString();
         }
 
