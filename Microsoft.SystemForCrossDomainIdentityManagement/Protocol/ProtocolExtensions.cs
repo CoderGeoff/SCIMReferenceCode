@@ -964,9 +964,10 @@ namespace Microsoft.SCIM
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "None")]
         internal static IEnumerable<ElectronicMailAddress> PatchElectronicMailAddresses(
-            IEnumerable<ElectronicMailAddress> electronicMailAddresses,
+            IEnumerable<ElectronicMailAddress> electronicMailAddressesAsEnumerable,
             PatchOperation2 operation)
         {
+            var electronicMailAddresses = electronicMailAddressesAsEnumerable.ToList();
             if (null == operation)
             {
                 return electronicMailAddresses;
@@ -1046,6 +1047,7 @@ namespace Microsoft.SCIM
                             (ElectronicMailAddress item) =>
                                 string.Equals(subAttribute.ComparisonValue, item.ItemType, StringComparison.Ordinal));
             }
+
             else
             {
                 electronicMailAddressExisting = null;
