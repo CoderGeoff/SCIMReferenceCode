@@ -964,10 +964,10 @@ namespace Microsoft.SCIM
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "None")]
         internal static IEnumerable<ElectronicMailAddress> PatchElectronicMailAddresses(
-            IEnumerable<ElectronicMailAddress> electronicMailAddressesAsEnumerable,
-            PatchOperation2 operation)
+            IEnumerable<ElectronicMailAddress>? electronicMailAddressesAsEnumerable,
+            PatchOperation2? operation)
         {
-            var electronicMailAddresses = electronicMailAddressesAsEnumerable.ToList();
+            var electronicMailAddresses = electronicMailAddressesAsEnumerable?.ToList() ?? new List<ElectronicMailAddress>();
             if (null == operation)
             {
                 return electronicMailAddresses;
@@ -994,7 +994,7 @@ namespace Microsoft.SCIM
                 return electronicMailAddresses;
             }
 
-            IFilter subAttribute = operation.Path.SubAttributes.SingleOrDefault();
+            var subAttribute = operation.Path.SubAttributes.SingleOrDefault();
             if (null == subAttribute)
             {
                 return electronicMailAddresses;
@@ -1036,22 +1036,19 @@ namespace Microsoft.SCIM
                 return electronicMailAddresses;
             }
 
-            ElectronicMailAddress electronicMailAddress;
-            ElectronicMailAddress electronicMailAddressExisting;
-            if (electronicMailAddresses != null)
+            ElectronicMailAddress newEmail;
+            ElectronicMailAddress? oldEmail;
+            var matchingEmails = electronicMailAddresses.Where(item => string.Equals(subAttribute.ComparisonValue, item.ItemType, StringComparison.Ordinal)).ToList();
+            if (matchingEmails.Any())
             {
-                electronicMailAddressExisting =
-                    electronicMailAddress =
-                        electronicMailAddresses
-                        .SingleOrDefault(
-                            (ElectronicMailAddress item) =>
-                                string.Equals(subAttribute.ComparisonValue, item.ItemType, StringComparison.Ordinal));
+                oldEmail = matchingEmails.Single();
+                newEmail = oldEmail;
             }
 
             else
             {
-                electronicMailAddressExisting = null;
-                electronicMailAddress =
+                oldEmail = null;
+                newEmail =
                     new ElectronicMailAddress()
                     {
                         ItemType = electronicMailAddressType
@@ -1063,22 +1060,22 @@ namespace Microsoft.SCIM
             (
                     value != null
                 && OperationName.Remove == operation.Name
-                && string.Equals(value, electronicMailAddress.Value, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(value, newEmail.Value, StringComparison.OrdinalIgnoreCase)
             )
             {
                 value = null;
             }
-            electronicMailAddress.Value = value;
+            newEmail.Value = value;
 
             IEnumerable<ElectronicMailAddress> result;
-            if (string.IsNullOrWhiteSpace(electronicMailAddress.Value))
+            if (string.IsNullOrWhiteSpace(newEmail.Value))
             {
-                if (electronicMailAddressExisting != null)
+                if (oldEmail != null)
                 {
                     result =
                         electronicMailAddresses
                         .Where(
-                            (ElectronicMailAddress item) =>
+                            item =>
                                 !string.Equals(subAttribute.ComparisonValue, item.ItemType, StringComparison.Ordinal))
                         .ToArray();
                 }
@@ -1089,7 +1086,7 @@ namespace Microsoft.SCIM
                 return result;
             }
 
-            if (electronicMailAddressExisting != null)
+            if (oldEmail != null)
             {
                 return electronicMailAddresses;
             }
@@ -1097,7 +1094,7 @@ namespace Microsoft.SCIM
             result =
                 new ElectronicMailAddress[]
                     {
-                        electronicMailAddress
+                        newEmail
                     };
             if (null == electronicMailAddresses)
             {

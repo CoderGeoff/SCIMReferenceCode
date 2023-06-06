@@ -11,14 +11,14 @@ namespace Microsoft.SCIM
     public abstract class Resource : Schematized
     {
         [DataMember(Name = AttributeNames.ExternalIdentifier, IsRequired = false, EmitDefaultValue = false)]
-        public string ExternalIdentifier
+        public string? ExternalIdentifier
         {
             get;
             set;
         }
 
         [DataMember(Name = AttributeNames.Identifier)]
-        public string Identifier
+        public string? Identifier
         {
             get;
             set;
@@ -26,13 +26,13 @@ namespace Microsoft.SCIM
 
         public virtual bool TryGetIdentifier(Uri baseIdentifier, out Uri identifier)
         {
-            identifier = null;
+            identifier = new Uri("http://unknown");
             return false;
         }
 
         public virtual bool TryGetPathIdentifier(out Uri pathIdentifier)
         {
-            pathIdentifier = null;
+            pathIdentifier = new Uri("http://unknown");
             return false;
         }
     }

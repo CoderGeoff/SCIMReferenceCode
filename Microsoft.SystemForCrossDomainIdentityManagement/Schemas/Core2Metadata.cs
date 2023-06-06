@@ -29,13 +29,13 @@ namespace Microsoft.SCIM
             set;
         }
         [DataMember(Name = AttributeNames.Version, Order = 3)]
-        public string Version
+        public string? Version
         {
             get;
             set;
         }
         [DataMember(Name = AttributeNames.Location, Order = 4)]
-        public string Location
+        public string? Location
         {
             get;
             set;
