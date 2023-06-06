@@ -2,23 +2,22 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 //------------------------------------------------------------
 
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.SCIM.WebHostSample.Provider;
+using Newtonsoft.Json;
+
 namespace Microsoft.SCIM.WebHostSample
 {
-    using System.Text;
-    using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Authentication;
-    using Microsoft.AspNetCore.Authentication.JwtBearer;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Routing;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Hosting;
-    using Microsoft.IdentityModel.Tokens;
-    using Microsoft.SCIM.WebHostSample.Provider;
-    using Newtonsoft.Json;
-
     public class Startup
     {
         private readonly IWebHostEnvironment environment;
@@ -29,11 +28,11 @@ namespace Microsoft.SCIM.WebHostSample
 
         public Startup(IWebHostEnvironment env, IConfiguration configuration)
         {
-            this.environment = env;
+            environment = env;
             this.configuration = configuration;
 
-            this.MonitoringBehavior = new ConsoleMonitor();
-            this.ProviderBehavior = new InMemoryProvider();
+            MonitoringBehavior = new ConsoleMonitor();
+            ProviderBehavior = new InMemoryProvider();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -50,7 +49,7 @@ namespace Microsoft.SCIM.WebHostSample
 
             void ConfigureJwtBearerOptons( JwtBearerOptions options)
             {
-                if (this.environment.IsDevelopment())
+                if (environment.IsDevelopment())
                 {
                     options.TokenValidationParameters =
                        new TokenValidationParameters
@@ -59,15 +58,15 @@ namespace Microsoft.SCIM.WebHostSample
                            ValidateAudience = false,
                            ValidateLifetime = false,
                            ValidateIssuerSigningKey = false,
-                           ValidIssuer = this.configuration["Token:TokenIssuer"],
-                           ValidAudience = this.configuration["Token:TokenAudience"],
-                           IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["Token:IssuerSigningKey"]))
+                           ValidIssuer = configuration["Token:TokenIssuer"],
+                           ValidAudience = configuration["Token:TokenAudience"],
+                           IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Token:IssuerSigningKey"]))
                        };
                 }
                 else
                 {
-                    options.Authority = this.configuration["Token:TokenIssuer"];
-                    options.Audience = this.configuration["Token:TokenAudience"];
+                    options.Authority = configuration["Token:TokenIssuer"];
+                    options.Audience = configuration["Token:TokenAudience"];
                     options.Events = new JwtBearerEvents
                     {
                         OnTokenValidated = context =>
@@ -83,14 +82,14 @@ namespace Microsoft.SCIM.WebHostSample
             services.AddAuthentication(ConfigureAuthenticationOptions).AddJwtBearer(ConfigureJwtBearerOptons);
             services.AddControllers().AddNewtonsoftJson(ConfigureMvcNewtonsoftJsonOptions);
 
-            services.AddSingleton(typeof(IProvider), this.ProviderBehavior);
-            services.AddSingleton(typeof(IMonitor), this.MonitoringBehavior);
+            services.AddSingleton(typeof(IProvider), ProviderBehavior);
+            services.AddSingleton(typeof(IMonitor), MonitoringBehavior);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
-            if (this.environment.IsDevelopment())
+            if (environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -103,7 +102,7 @@ namespace Microsoft.SCIM.WebHostSample
             app.UseMiddleware<ApplyScimContentTypeHeader>();
 
             app.UseEndpoints(
-                (IEndpointRouteBuilder endpoints) =>
+                endpoints =>
                 {
                     endpoints.MapDefaultControllerRoute();
                 });
