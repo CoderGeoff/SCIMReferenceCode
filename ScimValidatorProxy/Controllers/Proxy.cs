@@ -1,6 +1,11 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Permissions;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
@@ -23,17 +28,60 @@ namespace ScimValidatorProxy.Controllers
 
         public async Task ForwardAsync(HttpContext context)
         {
-            var targetUri = BuildTargetUri(context.Request);
+            var originalRequest = context.Request;
+            var targetUri = BuildTargetUri(originalRequest);
 
             if (targetUri != null)
             {
                 var targetRequestMessage = CreateTargetMessage(context, targetUri);
+                using var streamReader = new StreamReader(originalRequest.Body);
+                var content = await streamReader.ReadToEndAsync();
+                if (!string.IsNullOrEmpty(content))
+                {
+                    var (encoding, mediaType) = ToEncodingAndMediaType(originalRequest.ContentType);
+                    targetRequestMessage.Content = new StringContent(content, encoding, mediaType);
+                }
 
-                using var responseMessage = await httpClient.SendAsync(targetRequestMessage, HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
+                Console.WriteLine(ForwardingMessage(originalRequest, targetRequestMessage));
+
+                using var responseMessage = await httpClient.SendAsync(targetRequestMessage,
+                    HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
                 context.Response.StatusCode = (int)responseMessage.StatusCode;
                 CopyFromTargetResponseHeaders(context, responseMessage);
                 await responseMessage.Content.CopyToAsync(context.Response.Body);
             }
+        }
+
+        private static (Encoding encoding, string mediaType) ToEncodingAndMediaType(string contentType)
+        {
+            var parts = contentType.Split(";").Select(s => s.Trim()).ToArray();
+            var mediaType = string.Join("; ", parts[..^1]);
+            var encodingAsString = parts[^1].ToUpper().Replace("CHARSET=", "");
+            var encoding = Encoding.GetEncoding(encodingAsString);
+            return (encoding, mediaType);
+        }
+
+        private string ForwardingMessage(HttpRequest originalRequest, HttpRequestMessage forwardedRequest)
+        {
+            var s = new StringBuilder();
+            s.AppendLine($"Forwarding {originalRequest.Method} {originalRequest.Scheme}://{originalRequest.Host}{originalRequest.Path}");
+            AppendHeaders(s, originalRequest.Headers.Select(entry => KeyValuePair.Create(entry.Key, entry.Value.AsEnumerable())))
+               .AppendLine("")
+               .AppendLine("  to")
+               .AppendLine($"{forwardedRequest.Method} {forwardedRequest.RequestUri}");
+            AppendHeaders(s, forwardedRequest.Headers)
+               .AppendLine("").AppendLine("");
+            return s.ToString();
+        }
+
+        private static StringBuilder AppendHeaders(StringBuilder s, IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers)
+        {
+            foreach (var header in headers)
+            {
+                s.Append(header.Key).Append(" ").AppendJoin(", ", header.Value).AppendLine("");
+            }
+
+            return s;
         }
 
         private HttpRequestMessage CreateTargetMessage(HttpContext context, Uri targetUri)
@@ -63,7 +111,7 @@ namespace ScimValidatorProxy.Controllers
 
             foreach (var header in context.Request.Headers)
             {
-                requestMessage.Content?.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
+                requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
             }
         }
 
