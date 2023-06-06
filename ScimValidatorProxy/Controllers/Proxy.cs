@@ -14,13 +14,11 @@ namespace ScimValidatorProxy.Controllers
     public class Proxy : IProxy
     {
         private readonly string targetPort;
-        private readonly string proxyPort;
         private readonly HttpClient httpClient = new HttpClient();
 
-        public Proxy(string targetPort, string proxyPort)
+        public Proxy(string targetPort)
         {
             this.targetPort = targetPort;
-            this.proxyPort = proxyPort;
         }
 
         public async Task ForwardAsync(HttpContext context)
@@ -104,8 +102,7 @@ namespace ScimValidatorProxy.Controllers
 
         private Uri BuildTargetUri(HttpRequest request)
         {
-            var targetHost = request.Host.Value?.Replace(proxyPort, targetPort);
-            return new Uri($"https://{targetHost}{request.Path}");
+            return new Uri($"https://localhost:{targetPort}{request.Path}");
         }
     }
 }

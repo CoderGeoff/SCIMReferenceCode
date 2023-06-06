@@ -20,7 +20,7 @@ namespace ScimValidatorProxy
         public async Task InvokeAsync(HttpContext context)
         {
             var proxy = serviceProvider.GetService<IProxy>();
-            await proxy.ForwardAsync(context);
+            context.Response.OnStarting(async () => await proxy.ForwardAsync(context));
             await next(context);
         }
     }

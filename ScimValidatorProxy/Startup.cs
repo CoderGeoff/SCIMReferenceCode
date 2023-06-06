@@ -24,7 +24,7 @@ namespace ScimValidatorProxy
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton(typeof(IMonitor), MonitoringBehavior)
-                    .AddSingleton(typeof(IProxy), new Proxy("49975", "49977"));
+                    .AddSingleton(typeof(IProxy), new Proxy("49975"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
