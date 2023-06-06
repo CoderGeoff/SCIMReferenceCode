@@ -1,5 +1,7 @@
 // Copyright (c) Microsoft Corporation.// Licensed under the MIT license.
 
+using System.Collections.Concurrent;
+
 namespace Microsoft.SCIM.WebHostSample.Provider
 {
     using System;
@@ -15,8 +17,8 @@ namespace Microsoft.SCIM.WebHostSample.Provider
 
         private InMemoryStorage()
         {
-            this.Groups = new Dictionary<string, Core2Group>();
-            this.Users = new Dictionary<string, Core2EnterpriseUser>();
+            this.Groups = new ConcurrentDictionary<string, Core2Group>();
+            this.Users = new ConcurrentDictionary<string, Core2EnterpriseUser>();
         }
 
         private static readonly Lazy<InMemoryStorage> InstanceValue =
