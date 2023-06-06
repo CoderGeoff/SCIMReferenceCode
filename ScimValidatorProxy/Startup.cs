@@ -23,8 +23,7 @@ namespace ScimValidatorProxy
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton(typeof(IProvider), ProviderBehavior)
-                .AddSingleton(typeof(IMonitor), MonitoringBehavior)
+            services.AddSingleton(typeof(IMonitor), MonitoringBehavior)
                     .AddSingleton(typeof(IProxy), new Proxy("49975", "49977"));
         }
 
