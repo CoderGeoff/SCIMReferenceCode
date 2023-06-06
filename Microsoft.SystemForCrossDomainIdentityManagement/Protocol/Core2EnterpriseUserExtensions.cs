@@ -87,7 +87,7 @@ namespace Microsoft.SCIM
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "None")]
-        private static void Apply(this Core2EnterpriseUser user, PatchOperation2 operation)
+        private static void Apply(this Core2EnterpriseUser user, PatchOperation2? operation)
         {
             if (null == operation)
             {
@@ -101,9 +101,9 @@ namespace Microsoft.SCIM
 
             if (
                    !string.IsNullOrWhiteSpace(operation.Path.SchemaIdentifier)
-                && (operation?.Path?.SchemaIdentifier?.Equals(
-                        SchemaIdentifiers.Core2EnterpriseUser,
-                        StringComparison.OrdinalIgnoreCase) == true))
+                && operation.Path?.SchemaIdentifier?.Equals(
+                       SchemaIdentifiers.Core2EnterpriseUser,
+                       StringComparison.OrdinalIgnoreCase) == true)
             {
                 user.PatchEnterpriseExtension(operation);
                 return;
