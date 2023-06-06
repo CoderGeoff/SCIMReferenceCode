@@ -14,10 +14,10 @@ namespace Microsoft.SCIM
         {
             get;
             set;
-        }
+        } = null!;
 
         [DataMember(Name = AttributeNames.Primary, IsRequired = false)]
-        public bool Primary
+        public bool? Primary
         {
             get;
             set;

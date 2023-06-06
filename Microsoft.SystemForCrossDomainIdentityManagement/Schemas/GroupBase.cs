@@ -15,7 +15,7 @@ namespace Microsoft.SCIM
         {
             get;
             set;
-        }
+        } = null!;
 
         [DataMember(Name = AttributeNames.Members, IsRequired = false, EmitDefaultValue = false)]
         public virtual IEnumerable<Member>? Members

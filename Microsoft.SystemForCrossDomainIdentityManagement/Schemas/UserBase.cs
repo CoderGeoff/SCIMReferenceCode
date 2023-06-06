@@ -14,6 +14,6 @@ namespace Microsoft.SCIM
         {
             get;
             set;
-        }
+        } = null!;
     }
 }

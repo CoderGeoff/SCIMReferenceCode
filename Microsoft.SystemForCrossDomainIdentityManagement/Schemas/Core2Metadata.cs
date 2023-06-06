@@ -15,7 +15,8 @@ namespace Microsoft.SCIM
         {
             get;
             set;
-        }
+        } = null!;
+
         [DataMember(Name = AttributeNames.Created, Order = 1)]
         public DateTime Created
         {

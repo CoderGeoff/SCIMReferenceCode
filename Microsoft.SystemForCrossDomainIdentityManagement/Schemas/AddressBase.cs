@@ -20,42 +20,42 @@ namespace Microsoft.SCIM
         }
 
         [DataMember(Name = AttributeNames.Country, IsRequired = false, EmitDefaultValue = false)]
-        public string Country
+        public string? Country
         {
             get;
             set;
         }
 
         [DataMember(Name = AttributeNames.Formatted, IsRequired = false, EmitDefaultValue = false)]
-        public string Formatted
+        public string? Formatted
         {
             get;
             set;
         }
 
         [DataMember(Name = AttributeNames.Locality, IsRequired = false, EmitDefaultValue = false)]
-        public string Locality
+        public string? Locality
         {
             get;
             set;
         }
 
         [DataMember(Name = AttributeNames.PostalCode, IsRequired = false, EmitDefaultValue = false)]
-        public string PostalCode
+        public string? PostalCode
         {
             get;
             set;
         }
 
         [DataMember(Name = AttributeNames.Region, IsRequired = false, EmitDefaultValue = false)]
-        public string Region
+        public string? Region
         {
             get;
             set;
         }
 
         [DataMember(Name = AttributeNames.StreetAddress, IsRequired = false, EmitDefaultValue = false)]
-        public string StreetAddress
+        public string? StreetAddress
         {
             get;
             set;

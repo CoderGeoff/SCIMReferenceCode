@@ -11,7 +11,7 @@ namespace Microsoft.SCIM
     public sealed class ExtensionAttributeEnterpriseUser2 : ExtensionAttributeEnterpriseUserBase
     {
         [DataMember(Name = AttributeNames.Manager, IsRequired = false, EmitDefaultValue = false)]
-        public Manager Manager
+        public Manager? Manager
         {
             get;
             set;

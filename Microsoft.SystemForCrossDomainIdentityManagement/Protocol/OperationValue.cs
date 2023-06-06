@@ -13,14 +13,14 @@ namespace Microsoft.SCIM
         private const string Template = "{0} {1}";
 
         [DataMember(Name = ProtocolAttributeNames.Reference, Order = 0, IsRequired = false, EmitDefaultValue = false)]
-        public string Reference
+        public string? Reference
         {
             get;
             set;
         }
 
         [DataMember(Name = AttributeNames.Value, Order = 1, IsRequired = false, EmitDefaultValue = false)]
-        public string Value
+        public string? Value
         {
             get;
             set;

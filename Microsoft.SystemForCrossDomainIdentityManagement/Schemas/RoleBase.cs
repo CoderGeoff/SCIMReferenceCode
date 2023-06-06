@@ -10,14 +10,14 @@ namespace Microsoft.SCIM
     public abstract class RoleBase : TypedItem
     {
         [DataMember(Name = AttributeNames.Display, IsRequired = false, EmitDefaultValue = false)]
-        public string Display
+        public string? Display
         {
             get;
             set;
         }
 
         [DataMember(Name = AttributeNames.Value, IsRequired = false, EmitDefaultValue = false)]
-        public string Value
+        public string? Value
         {
             get;
             set;
