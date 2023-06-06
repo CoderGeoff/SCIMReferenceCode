@@ -11,7 +11,7 @@ namespace ScimValidatorProxy
     {
         public static void Main(string[] args)
         {
-            Program.CreateHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
