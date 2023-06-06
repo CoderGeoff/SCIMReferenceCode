@@ -8,9 +8,9 @@ namespace Microsoft.SCIM
 
     public interface IPath
     {
-        string AttributePath { get; }
-        string SchemaIdentifier { get; }
+        string? AttributePath { get; }
+        string? SchemaIdentifier { get; }
         IReadOnlyCollection<IFilter> SubAttributes { get; }
-        IPath ValuePath { get; }
+        IPath? ValuePath { get; }
     }
 }

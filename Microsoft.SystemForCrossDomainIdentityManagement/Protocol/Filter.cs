@@ -108,7 +108,7 @@ namespace Microsoft.SCIM
             or
         }
 
-        public IFilter AdditionalFilter
+        public IFilter? AdditionalFilter
         {
             get;
             set;

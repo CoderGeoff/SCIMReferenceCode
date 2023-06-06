@@ -69,7 +69,7 @@ namespace Microsoft.SCIM
             }
         }
 
-        public IPath Path
+        public IPath? Path
         {
             get
             {

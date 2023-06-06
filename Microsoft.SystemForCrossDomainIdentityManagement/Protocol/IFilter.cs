@@ -6,7 +6,7 @@ namespace Microsoft.SCIM
 {
     public interface IFilter
     {
-        IFilter AdditionalFilter { get; set; }
+        IFilter? AdditionalFilter { get; set; }
         string AttributePath { get; }
         string ComparisonValue { get; }
         string ComparisonValueEncoded { get; }
