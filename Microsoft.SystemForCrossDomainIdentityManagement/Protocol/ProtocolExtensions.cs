@@ -1154,26 +1154,16 @@ namespace Microsoft.SCIM
                 return roles;
             }
 
-            Role role;
-            Role roleExisting;
+            Role? roleExisting = null;
             if (roles != null)
             {
                 roleExisting =
-                    role =
                         roles
                         .SingleOrDefault(
                             (Role item) =>
                                 string.Equals(subAttribute.ComparisonValue, item.ItemType, StringComparison.Ordinal));
             }
-            else
-            {
-                roleExisting = null;
-                role =
-                    new Role()
-                    {
-                        Primary = true
-                    };
-            }
+            Role role = roleExisting ?? new Role { Primary = true };
 
             string value = operation.Value?.Single().Value;
             if
