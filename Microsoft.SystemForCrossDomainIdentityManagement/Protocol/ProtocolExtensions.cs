@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------
+//------------------------------------------------------------
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 //------------------------------------------------------------
 
@@ -186,6 +186,7 @@ namespace Microsoft.SCIM
                                 break;
 
                             case OperationName.Remove:
+                            {
                                 if (null == group.Members)
                                 {
                                     break;
@@ -203,16 +204,19 @@ namespace Microsoft.SCIM
                                 {
                                     members.Add(item.Value, item);
                                 }
+                            }
 
-                                foreach (OperationValue operationValue in operation.Value)
-                                {
-                                    if (members.TryGetValue(operationValue.Value, out Member removedMember))
-                                    {
-                                        members.Remove(operationValue.Value);
-                                    }
-                                }
+                                break;
+                            case OperationName.Replace:
+                            {
+                                group.Members 
+                                    = operation.Value
+                                               .Select(val => val.Value)
+                                               .Where(val => val is not null)
+                                               .Select(val => new Member { Value = val! })
+                                               .ToArray();
 
-                                group.Members = members.Values;
+                            }
                                 break;
                         }
                     }
