@@ -331,27 +331,17 @@ namespace Microsoft.SCIM
                 return;
             }
 
-            Address address;
-            Address addressExisting;
+            Address? addressExisting = null;
             if (user.Addresses != null)
             {
                 addressExisting =
-                    address =
                         user
                         .Addresses
                         .SingleOrDefault(
                             (Address item) =>
                                 string.Equals(subAttribute.ComparisonValue, item.ItemType, StringComparison.Ordinal));
             }
-            else
-            {
-                addressExisting = null;
-                address =
-                    new Address()
-                    {
-                        ItemType = subAttribute.ComparisonValue
-                    };
-            }
+            var address = addressExisting ?? new Address { ItemType = subAttribute.ComparisonValue };
 
             string value;
             if (string.Equals(Address.Work, subAttribute.ComparisonValue, StringComparison.Ordinal))
@@ -488,7 +478,8 @@ namespace Microsoft.SCIM
 
             if
             (
-                    string.IsNullOrWhiteSpace(address.Country)
+                address is not null
+                && string.IsNullOrWhiteSpace(address.Country)
                 && string.IsNullOrWhiteSpace(address.Locality)
                 && string.IsNullOrWhiteSpace(address.PostalCode)
                 && string.IsNullOrWhiteSpace(address.Region)
